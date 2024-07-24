@@ -25,7 +25,7 @@ library(styler)
 library(janitor)
 
 # Clear the decks
-rm(list=ls())
+rm(list = ls())
 
 # Bring in the data
 main <- read.csv("Raw-data/1_Survey-Main.csv")
@@ -58,19 +58,19 @@ comb <- comb |>
 ## --------------- CHANGE COLUMNS ----------------------------------------------
 
 # Two places use the same name...
-comb[26,2] <- 'Share the Harvest Columbia'
-comb[27,2] <- 'Share the Harvest Jefferson City'
+comb[26, 2] <- "Share the Harvest Columbia"
+comb[27, 2] <- "Share the Harvest Jefferson City"
 
-comb[37,2] <- 'Hunters Against Hunger Oklahoma City'
-comb[21,2] <- 'Hunters Against Hunger Missoula'
+comb[37, 2] <- "Hunters Against Hunger Oklahoma City"
+comb[21, 2] <- "Hunters Against Hunger Missoula"
 
-comb[32,2] <- 'Hunters for the Hungry Texas'
-comb[41,2] <- 'Hunters for the Hungry San Antonio'
-comb[4,2] <- 'Hunters for the Hungry Covington'
+comb[32, 2] <- "Hunters for the Hungry Texas"
+comb[41, 2] <- "Hunters for the Hungry San Antonio"
+comb[4, 2] <- "Hunters for the Hungry Covington"
 
-comb[39,2] <- 'Farmers and Hunters Feeding the Hungry Fort Recovery'
-comb[16,2] <- 'Farmers and Hunters Feeding the Hungry Donald'
-comb[18,2] <- 'Farmers and Hunters Feeding the Hungry Sunbury'
+comb[39, 2] <- "Farmers and Hunters Feeding the Hungry Fort Recovery"
+comb[16, 2] <- "Farmers and Hunters Feeding the Hungry Donald"
+comb[18, 2] <- "Farmers and Hunters Feeding the Hungry Sunbury"
 
 comb <- comb |>
   mutate(Program_name = str_to_title(Program_name))
@@ -158,14 +158,19 @@ colnames(comb)[111] <- "Funding_other_units"
 
 ## --------------- CREATE DONATIONS DF -----------------------------------------
 
+# Create a vector of column names
+col.list <- as_tibble(colnames(comb))
+
 # Create a vector of the columns we want
-donations.col <- c("Total_donations",
-  "Total_donations_units", "White_tailed_deer", "White_tailed_deer_units", 
-  "Mule_deer", "Mule_deer_units", "Pronghorn", "Pronghorn_units", "Elk", 
-  "Elk_units", "Turkey", "Turkey_units", "Black_bear", "Black_bear_units", 
-  "Moose", "Moose_units", "Pigs", "Pigs_units", "Sheep_goats", 
-  "Sheep_goats_units", "Bison", "Bison_units", "Alligator", "Alligator_units", 
-  "Game_birds", "Game_birds_units", "Other_donations", "Other_donations_units")
+donations.col <- c(
+  "Total_donations",
+  "Total_donations_units", "White_tailed_deer", "White_tailed_deer_units",
+  "Mule_deer", "Mule_deer_units", "Pronghorn", "Pronghorn_units", "Elk",
+  "Elk_units", "Turkey", "Turkey_units", "Black_bear", "Black_bear_units",
+  "Moose", "Moose_units", "Pigs", "Pigs_units", "Sheep_goats",
+  "Sheep_goats_units", "Bison", "Bison_units", "Alligator", "Alligator_units",
+  "Game_birds", "Game_birds_units", "Other_donations", "Other_donations_units"
+)
 
 donations <- comb |> dplyr::select(
   "Program", all_of(donations.col)
@@ -187,20 +192,20 @@ donations.lg <- donations %>%
   rename(Units = units)
 
 # Remove characters so the donation column can be numeric
-colnames(donations.lg)[3] <- 'Donations'
+colnames(donations.lg)[3] <- "Donations"
 donations.lg$Donations <- gsub("[^0-9.]", "", donations.lg$Donations)
 
 
-donations.lg[239,3] <- '4000' # Manually get rid of the period
-donations.lg[240,3] <- '4000'# Manually get rid of the period 
-donations.lg[253,3] <- '400' # Manually get rid of the period
-donations.lg[254,3] <- '400' # Manually get rid of the period
+donations.lg[239, 3] <- "4000" # Manually get rid of the period
+donations.lg[240, 3] <- "4000" # Manually get rid of the period
+donations.lg[253, 3] <- "400" # Manually get rid of the period
+donations.lg[254, 3] <- "400" # Manually get rid of the period
 
-donations.lg[309,3] <- '300000' # Added up the values
-donations.lg[337,3] <- '7610' # Added up the values
-donations.lg[463,3] <- '8059' # Added up the values
+donations.lg[309, 3] <- "300000" # Added up the values
+donations.lg[337, 3] <- "7610" # Added up the values
+donations.lg[463, 3] <- "8059" # Added up the values
 
-donations.lg[534,3] <- '1000' # Fixed values
+donations.lg[534, 3] <- "1000" # Fixed values
 
 # Convert to numeric
 donations.lg$Donations <- as.numeric(donations.lg$Donations)
@@ -210,7 +215,7 @@ donations.lg$Donations <- round(donations.lg$Donations)
 
 # Take a look at the total donations data
 processed_data <- donations.lg |>
-  filter(Type == 'Total_donations') |>
+  filter(Type == "Total_donations") |>
   filter(Donations > 0) |>
   group_by(Program) |>
   summarise(Donations = sum(Donations, na.rm = TRUE)) |>
@@ -222,12 +227,14 @@ processed_data <- donations.lg |>
   mutate(Program_abbr = fct_inorder(Program_abbr))
 
 ggplot(processed_data, aes(x = fct_rev(Program_abbr), y = Donations)) +
-  geom_bar(stat = 'identity', fill = "skyblue") +
+  geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +
   theme_minimal() +
-  labs(title = "Total Donations by Program",
-       x = "Program (Abbreviated)",
-       y = "Donations") +
+  labs(
+    title = "Total Donations by Program",
+    x = "Program (Abbreviated)",
+    y = "Donations"
+  ) +
   scale_y_continuous(labels = scales::comma)
 
 unique(processed_data$Program) # 37 values
@@ -235,21 +242,30 @@ unique(processed_data$Program) # 37 values
 library(fitdistrplus)
 descdist(processed_data$Donations) # beta
 
+library(EnvStats)
+ebeta(processed_data$Donations, method = "mle")
+
+scale_values <- function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+ebeta(scale_values(processed_data$Donations))
+
 # Clear the decks
 rm(donations, processed_data)
 
 ## --------------- CREATE FUNDS DF ---------------------------------------------
 
 # Create a vector of the columns we need
-funds.col <- c("Funding_total", "Funding_total_units", "Funding_public_donations",
-               "Funding_corporate_sponsors", "Funding_nonprofit_sponsors",
-               "Funding_grants", "Funding_state_agency", "Funding_other",
-               "Funding_public_donations_units", "Funding_corporate_sponsors_units",
-               "Funding_nonprofit_sponsors_units", "Funding_grants_units",
-               "Funding_state_agency_units", "Funding_other_units")
+funds.col <- c(
+  "Funding_total", "Funding_total_units", "Funding_public_donations",
+  "Funding_corporate_sponsors", "Funding_nonprofit_sponsors",
+  "Funding_grants", "Funding_state_agency", "Funding_other",
+  "Funding_public_donations_units", "Funding_corporate_sponsors_units",
+  "Funding_nonprofit_sponsors_units", "Funding_grants_units",
+  "Funding_state_agency_units", "Funding_other_units"
+)
 
 funds <- comb |> dplyr::select(Program, all_of(funds.col))
-
 
 # Pivot the data to longer format
 funds.lg <- funds %>%
@@ -267,7 +283,7 @@ funds.lg <- funds %>%
   rename(Units = units)
 
 # Remove characters so the donation column can be numeric
-colnames(funds.lg)[3] <- 'Donations'
+colnames(funds.lg)[3] <- "Donations"
 funds.lg$Donations <- gsub("[^0-9.]", "", funds.lg$Donations)
 
 # Convert to numeric
@@ -278,7 +294,7 @@ funds.lg$Donations <- round(funds.lg$Donations)
 
 # Take a look at the total donations data
 processed_data <- funds.lg |>
-  filter(Type == 'Funding_total') |>
+  filter(Type == "Funding_total") |>
   filter(Donations > 0) |>
   group_by(Program) |>
   summarise(Donations = sum(Donations, na.rm = TRUE)) |>
@@ -290,12 +306,14 @@ processed_data <- funds.lg |>
   mutate(Program_abbr = fct_inorder(Program_abbr))
 
 ggplot(processed_data, aes(x = fct_rev(Program_abbr), y = Donations)) +
-  geom_bar(stat = 'identity', fill = "skyblue") +
+  geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +
   theme_minimal() +
-  labs(title = "Total Donations by Program",
-       x = "Program (Abbreviated)",
-       y = "Donations") +
+  labs(
+    title = "Total Donations by Program",
+    x = "Program (Abbreviated)",
+    y = "Donations"
+  ) +
   scale_y_continuous(labels = scales::comma)
 
 unique(processed_data$Program) # 28 values
@@ -308,7 +326,53 @@ rm(funds, processed_data)
 
 ## --------------- CREATE CHALLENGES/EXPANSION DF ------------------------------
 
-expansion <- comb |> select()
+expansion.col <- c(
+  "Challenges_USDA_inspection",
+  "Challenges_state_inspection",
+  "Challengea_hunters",
+  "Challenges_funding",
+  "Challenges_processors",
+  "Challenges_transportation",
+  "Challenges_storage",
+  "Challenges_Other",
+  "Challenges_comments"
+)
+
+expansion <- comb |> dplyr::select(Program, all_of(expansion.col))
+
+# 10 is a critical challenge, 0 is no challenge
+
+expansion.lg <- expansion |>
+  pivot_longer(cols = 2:9, names_to = "Type", values_to = "Score") |>
+  dplyr::select(Program, Type, Score, Challenges_comments)
+
+expansion.lg$Score <- as.numeric(expansion.lg$Score)
+
+processed_data <- expansion.lg |>
+  group_by(Type) |>
+  summarize(Mean = mean(Score, na.rm = TRUE),
+            std = sd(Score, na.rm = TRUE)) |>
+  arrange(desc(Mean))
+
+class(processed_data$Type)
+processed_data$Type <- as_factor(processed_data$Type)
+
+# new_levels <- gsub(".*_", "", levels(processed_data$Type))
+# levels(processed_data$Type) <- new_levels
+processed_data$Type <- factor(processed_data$Type, levels = processed_data$Type)
+
+
+ggplot(processed_data, aes(x = fct_rev(Type), y = Mean)) +
+  geom_errorbar(aes(ymin = Mean-std, ymax = Mean+std))+
+  geom_bar(stat = "identity", fill = "skyblue") +
+  coord_flip() +
+  theme_minimal() +
+  labs(
+    title = "Biggest challengs",
+    x = "Challenge type",
+    y = "Mean score"
+  ) +
+  scale_y_continuous(labels = scales::comma)
 
 ## --------------- CREATE STRUCTURE DF -----------------------------------------
 structure <- comb |> select()
@@ -316,5 +380,3 @@ structure <- comb |> select()
 ## --------------- CREATE CHARACTERISTICS DF -----------------------------------
 
 char <- comb |> select("Program", -all_of(donations.col))
-
-
