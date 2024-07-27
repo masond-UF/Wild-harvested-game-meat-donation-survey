@@ -136,11 +136,11 @@ colnames(comb)[88] <- "Employees_volunteer_hrs"
 colnames(comb)[89] <- "Employees_full_time"
 colnames(comb)[90] <- "Employees_part_time"
 colnames(comb)[91] <- "Employees_paid_hrs"
-colnames(comb)[92] <- "Employees_units"
-colnames(comb)[93] <- "Employees_units"
-colnames(comb)[94] <- "Employees_units"
-colnames(comb)[95] <- "Employees_units"
-colnames(comb)[96] <- "Employees_units"
+colnames(comb)[92] <- "Employees_units_volunteers"
+colnames(comb)[93] <- "Employees_units_volunteer_hrs"
+colnames(comb)[94] <- "Employees_units_full_time"
+colnames(comb)[95] <- "Employees_units_part_time"
+colnames(comb)[96] <- "Employees_units_paid_hrs"
 colnames(comb)[98] <- "Funding_total"
 colnames(comb)[99] <- "Funding_total_units"
 colnames(comb)[100] <- "Funding_public_donations"
@@ -155,6 +155,42 @@ colnames(comb)[108] <- "Funding_nonprofit_sponsors_units"
 colnames(comb)[109] <- "Funding_grants_units"
 colnames(comb)[110] <- "Funding_state_agency_units"
 colnames(comb)[111] <- "Funding_other_units"
+
+# Fix state names 
+class(comb$State)
+convert_to_abbreviation <- function(state) {
+  if (state %in% state.abb) {
+    return(state)  # Already abbreviated
+  } else {
+    match_index <- match(state, state.name)
+    if (!is.na(match_index)) {
+      return(state.abb[match_index])  # Convert to abbreviation
+    } else {
+      return(state)  # If not found, return the original
+    }
+  }
+}
+
+comb <- comb %>%
+  mutate(State = sapply(State, convert_to_abbreviation))
+
+# Fix the stragglers
+comb[1,4] <- 'YK'
+comb[16,4] <- 'SC'
+comb[19,4] <- 'KY'
+comb[22,4] <- 'NE'
+comb[28,4] <- 'AK'
+comb[30,4] <- 'NJ'
+
+comb[30,3] <- 'Lebanon'
+
+# Create unique ID
+library(stringr)
+comb <- comb |>
+  mutate(Program_ID = paste0(word(Program,1),"_", City,'_', State)) |>
+  dplyr::select(Program_ID, everything())
+
+  # Fix Lincoln, NE
 
 ## --------------- CREATE DONATIONS DF -----------------------------------------
 
@@ -322,7 +358,7 @@ library(fitdistrplus)
 descdist(processed_data$Donations) # beta
 
 # Clear the decks
-rm(funds, processed_data)
+rm(funds, processed_data, funds)
 
 ## --------------- CREATE CHALLENGES/EXPANSION DF ------------------------------
 
@@ -350,20 +386,21 @@ expansion.lg$Score <- as.numeric(expansion.lg$Score)
 
 processed_data <- expansion.lg |>
   group_by(Type) |>
-  summarize(Mean = mean(Score, na.rm = TRUE),
-            std = sd(Score, na.rm = TRUE)) |>
+  summarize(
+    Mean = mean(Score, na.rm = TRUE),
+    std = sd(Score, na.rm = TRUE)
+  ) |>
   arrange(desc(Mean))
 
 class(processed_data$Type)
 processed_data$Type <- as_factor(processed_data$Type)
 
-# new_levels <- gsub(".*_", "", levels(processed_data$Type))
-# levels(processed_data$Type) <- new_levels
+new_levels <- sub("^[^_]*_([^_]*).*", "\\1", levels(processed_data$Type))
+levels(processed_data$Type) <- new_levels
 processed_data$Type <- factor(processed_data$Type, levels = processed_data$Type)
 
-
 ggplot(processed_data, aes(x = fct_rev(Type), y = Mean)) +
-  geom_errorbar(aes(ymin = Mean-std, ymax = Mean+std))+
+  geom_errorbar(aes(ymin = Mean - std, ymax = Mean + std)) +
   geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +
   theme_minimal() +
@@ -374,8 +411,19 @@ ggplot(processed_data, aes(x = fct_rev(Type), y = Mean)) +
   ) +
   scale_y_continuous(labels = scales::comma)
 
+rm(processed_data, expansion.lg.sum, expansion)
 ## --------------- CREATE STRUCTURE DF -----------------------------------------
-structure <- comb |> select()
+
+structure.col <- c(
+  "Employees_volunteers", "Employees_volunteer_hrs",
+  "Employees_full_time", "Employees_part_time",
+  "Employees_paid_hrs", "Employees_units_volunteers",
+  "Employees_units_volunteer_hrs", "Employees_units_full_time",
+  "Employees_units_part_time", "Employees_units_paid_hrs",
+  "Employees_comments"
+)
+
+structure <- comb |> dplyr::select(Program, State, all_of(structure.col))
 
 ## --------------- CREATE CHARACTERISTICS DF -----------------------------------
 
