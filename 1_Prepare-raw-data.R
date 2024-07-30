@@ -42,11 +42,11 @@ main <- main |>
   filter(!is.na(Program_name) & Program_name != "")
 
 # Combine data
-comb <- main
+comb.dat <- main
 rm(main)
 
 # Drop unused rows
-comb <- comb |>
+comb.dat <- comb.dat |>
   dplyr::select(
     -"Start Date", -"Response Type", -"Progress",
     -"Duration (in seconds)", -Finished, -"Recorded Date",
@@ -58,106 +58,106 @@ comb <- comb |>
 ## --------------- CHANGE COLUMNS ----------------------------------------------
 
 # Two places use the same name...
-comb[26, 2] <- "Share the Harvest Columbia"
-comb[27, 2] <- "Share the Harvest Jefferson City"
+comb.dat[26, 2] <- "Share the Harvest Columbia"
+comb.dat[27, 2] <- "Share the Harvest Jefferson City"
 
-comb[37, 2] <- "Hunters Against Hunger Oklahoma City"
-comb[21, 2] <- "Hunters Against Hunger Missoula"
+comb.dat[37, 2] <- "Hunters Against Hunger Oklahoma City"
+comb.dat[21, 2] <- "Hunters Against Hunger Missoula"
 
-comb[32, 2] <- "Hunters for the Hungry Texas"
-comb[41, 2] <- "Hunters for the Hungry San Antonio"
-comb[4, 2] <- "Hunters for the Hungry Covington"
+comb.dat[32, 2] <- "Hunters for the Hungry Texas"
+comb.dat[41, 2] <- "Hunters for the Hungry San Antonio"
+comb.dat[4, 2] <- "Hunters for the Hungry Covington"
 
-comb[39, 2] <- "Farmers and Hunters Feeding the Hungry Fort Recovery"
-comb[16, 2] <- "Farmers and Hunters Feeding the Hungry Donald"
-comb[18, 2] <- "Farmers and Hunters Feeding the Hungry Sunbury"
+comb.dat[39, 2] <- "Farmers and Hunters Feeding the Hungry Fort Recovery"
+comb.dat[16, 2] <- "Farmers and Hunters Feeding the Hungry Donald"
+comb.dat[18, 2] <- "Farmers and Hunters Feeding the Hungry Sunbury"
 
-comb <- comb |>
+comb.dat <- comb.dat |>
   mutate(Program_name = str_to_title(Program_name))
 
-colnames(comb)[1] <- "DateTime"
-colnames(comb)[2] <- "Program"
-colnames(comb)[3] <- "City"
-colnames(comb)[4] <- "State"
-colnames(comb)[5] <- "Country"
-colnames(comb)[5] <- "Postal"
-colnames(comb)[13] <- "Network_name"
-colnames(comb)[14] <- "Network_scale"
-colnames(comb)[17] <- "Program_start"
-colnames(comb)[18] <- "Program_length"
-colnames(comb)[20] <- "Sample_start_month"
-colnames(comb)[21] <- "Sample_start_year"
-colnames(comb)[22] <- "Sample_end_month"
-colnames(comb)[23] <- "Sample_end_year"
-colnames(comb)[25] <- "Total_donations"
-colnames(comb)[26] <- "Total_donations_units"
-colnames(comb)[27] <- "White_tailed_deer"
-colnames(comb)[28] <- "Mule_deer"
-colnames(comb)[29] <- "Pronghorn"
-colnames(comb)[30] <- "Elk"
-colnames(comb)[31] <- "Turkey"
-colnames(comb)[32] <- "Black_bear"
-colnames(comb)[33] <- "Moose"
-colnames(comb)[34] <- "Pigs"
-colnames(comb)[35] <- "Sheep_goats"
-colnames(comb)[36] <- "Bison"
-colnames(comb)[37] <- "Alligator"
-colnames(comb)[38] <- "Game_birds"
-colnames(comb)[39] <- "Other_donations"
-colnames(comb)[40] <- "White_tailed_deer_units"
-colnames(comb)[41] <- "Mule_deer_units"
-colnames(comb)[42] <- "Pronghorn_units"
-colnames(comb)[43] <- "Elk_units"
-colnames(comb)[44] <- "Turkey_units"
-colnames(comb)[45] <- "Black_bear_units"
-colnames(comb)[46] <- "Moose_units"
-colnames(comb)[47] <- "Pigs_units"
-colnames(comb)[48] <- "Sheep_goats_units"
-colnames(comb)[49] <- "Bison_units"
-colnames(comb)[50] <- "Alligator_units"
-colnames(comb)[51] <- "Game_birds_units"
-colnames(comb)[52] <- "Other_donations_units"
-colnames(comb)[53] <- "Donations_comments"
-colnames(comb)[54] <- "Average_donation_distance"
-colnames(comb)[55] <- "Max_donation_distance"
-colnames(comb)[56] <- "Average_donation_distance_units"
-colnames(comb)[57] <- "Max_donation_distance_units"
-colnames(comb)[58] <- "Program_scale"
-colnames(comb)[60] <- "Challenges_USDA_inspection"
-colnames(comb)[61] <- "Challenges_state_inspection"
-colnames(comb)[62] <- "Challengea_hunters"
-colnames(comb)[63] <- "Challenges_funding"
-colnames(comb)[64] <- "Challenges_processors"
-colnames(comb)[65] <- "Challenges_transportation"
-colnames(comb)[66] <- "Challenges_storage"
-colnames(comb)[67] <- "Challenges_Other"
-colnames(comb)[87] <- "Employees_volunteers"
-colnames(comb)[88] <- "Employees_volunteer_hrs"
-colnames(comb)[89] <- "Employees_full_time"
-colnames(comb)[90] <- "Employees_part_time"
-colnames(comb)[91] <- "Employees_paid_hrs"
-colnames(comb)[92] <- "Employees_units_volunteers"
-colnames(comb)[93] <- "Employees_units_volunteer_hrs"
-colnames(comb)[94] <- "Employees_units_full_time"
-colnames(comb)[95] <- "Employees_units_part_time"
-colnames(comb)[96] <- "Employees_units_paid_hrs"
-colnames(comb)[98] <- "Funding_total"
-colnames(comb)[99] <- "Funding_total_units"
-colnames(comb)[100] <- "Funding_public_donations"
-colnames(comb)[101] <- "Funding_corporate_sponsors"
-colnames(comb)[102] <- "Funding_nonprofit_sponsors"
-colnames(comb)[103] <- "Funding_grants"
-colnames(comb)[104] <- "Funding_state_agency"
-colnames(comb)[105] <- "Funding_other"
-colnames(comb)[106] <- "Funding_public_donations_units"
-colnames(comb)[107] <- "Funding_corporate_sponsors_units"
-colnames(comb)[108] <- "Funding_nonprofit_sponsors_units"
-colnames(comb)[109] <- "Funding_grants_units"
-colnames(comb)[110] <- "Funding_state_agency_units"
-colnames(comb)[111] <- "Funding_other_units"
+colnames(comb.dat)[1] <- "DateTime"
+colnames(comb.dat)[2] <- "Program"
+colnames(comb.dat)[3] <- "City"
+colnames(comb.dat)[4] <- "State"
+colnames(comb.dat)[5] <- "Country"
+colnames(comb.dat)[5] <- "Postal"
+colnames(comb.dat)[13] <- "Network_name"
+colnames(comb.dat)[14] <- "Network_scale"
+colnames(comb.dat)[17] <- "Program_start"
+colnames(comb.dat)[18] <- "Program_length"
+colnames(comb.dat)[20] <- "Sample_start_month"
+colnames(comb.dat)[21] <- "Sample_start_year"
+colnames(comb.dat)[22] <- "Sample_end_month"
+colnames(comb.dat)[23] <- "Sample_end_year"
+colnames(comb.dat)[25] <- "Total_donations"
+colnames(comb.dat)[26] <- "Total_donations_units"
+colnames(comb.dat)[27] <- "White_tailed_deer"
+colnames(comb.dat)[28] <- "Mule_deer"
+colnames(comb.dat)[29] <- "Pronghorn"
+colnames(comb.dat)[30] <- "Elk"
+colnames(comb.dat)[31] <- "Turkey"
+colnames(comb.dat)[32] <- "Black_bear"
+colnames(comb.dat)[33] <- "Moose"
+colnames(comb.dat)[34] <- "Pigs"
+colnames(comb.dat)[35] <- "Sheep_goats"
+colnames(comb.dat)[36] <- "Bison"
+colnames(comb.dat)[37] <- "Alligator"
+colnames(comb.dat)[38] <- "Game_birds"
+colnames(comb.dat)[39] <- "Other_donations"
+colnames(comb.dat)[40] <- "White_tailed_deer_units"
+colnames(comb.dat)[41] <- "Mule_deer_units"
+colnames(comb.dat)[42] <- "Pronghorn_units"
+colnames(comb.dat)[43] <- "Elk_units"
+colnames(comb.dat)[44] <- "Turkey_units"
+colnames(comb.dat)[45] <- "Black_bear_units"
+colnames(comb.dat)[46] <- "Moose_units"
+colnames(comb.dat)[47] <- "Pigs_units"
+colnames(comb.dat)[48] <- "Sheep_goats_units"
+colnames(comb.dat)[49] <- "Bison_units"
+colnames(comb.dat)[50] <- "Alligator_units"
+colnames(comb.dat)[51] <- "Game_birds_units"
+colnames(comb.dat)[52] <- "Other_donations_units"
+colnames(comb.dat)[53] <- "Donations_comments"
+colnames(comb.dat)[54] <- "Average_donation_distance"
+colnames(comb.dat)[55] <- "Max_donation_distance"
+colnames(comb.dat)[56] <- "Average_donation_distance_units"
+colnames(comb.dat)[57] <- "Max_donation_distance_units"
+colnames(comb.dat)[58] <- "Program_scale"
+colnames(comb.dat)[60] <- "Challenges_USDA_inspection"
+colnames(comb.dat)[61] <- "Challenges_state_inspection"
+colnames(comb.dat)[62] <- "Challengea_hunters"
+colnames(comb.dat)[63] <- "Challenges_funding"
+colnames(comb.dat)[64] <- "Challenges_processors"
+colnames(comb.dat)[65] <- "Challenges_transportation"
+colnames(comb.dat)[66] <- "Challenges_storage"
+colnames(comb.dat)[67] <- "Challenges_Other"
+colnames(comb.dat)[87] <- "Employees_volunteers"
+colnames(comb.dat)[88] <- "Employees_volunteer_hrs"
+colnames(comb.dat)[89] <- "Employees_full_time"
+colnames(comb.dat)[90] <- "Employees_part_time"
+colnames(comb.dat)[91] <- "Employees_paid_hrs"
+colnames(comb.dat)[92] <- "Employees_units_volunteers"
+colnames(comb.dat)[93] <- "Employees_units_volunteer_hrs"
+colnames(comb.dat)[94] <- "Employees_units_full_time"
+colnames(comb.dat)[95] <- "Employees_units_part_time"
+colnames(comb.dat)[96] <- "Employees_units_paid_hrs"
+colnames(comb.dat)[98] <- "Funding_total"
+colnames(comb.dat)[99] <- "Funding_total_units"
+colnames(comb.dat)[100] <- "Funding_public_donations"
+colnames(comb.dat)[101] <- "Funding_corporate_sponsors"
+colnames(comb.dat)[102] <- "Funding_nonprofit_sponsors"
+colnames(comb.dat)[103] <- "Funding_grants"
+colnames(comb.dat)[104] <- "Funding_state_agency"
+colnames(comb.dat)[105] <- "Funding_other"
+colnames(comb.dat)[106] <- "Funding_public_donations_units"
+colnames(comb.dat)[107] <- "Funding_corporate_sponsors_units"
+colnames(comb.dat)[108] <- "Funding_nonprofit_sponsors_units"
+colnames(comb.dat)[109] <- "Funding_grants_units"
+colnames(comb.dat)[110] <- "Funding_state_agency_units"
+colnames(comb.dat)[111] <- "Funding_other_units"
 
 # Fix state names 
-class(comb$State)
+class(comb.dat$State)
 convert_to_abbreviation <- function(state) {
   if (state %in% state.abb) {
     return(state)  # Already abbreviated
@@ -171,22 +171,22 @@ convert_to_abbreviation <- function(state) {
   }
 }
 
-comb <- comb %>%
+comb.dat <- comb.dat %>%
   mutate(State = sapply(State, convert_to_abbreviation))
 
 # Fix the stragglers
-comb[1,4] <- 'YK'
-comb[16,4] <- 'SC'
-comb[19,4] <- 'KY'
-comb[22,4] <- 'NE'
-comb[28,4] <- 'AK'
-comb[30,4] <- 'NJ'
+comb.dat[1,4] <- 'YK'
+comb.dat[16,4] <- 'SC'
+comb.dat[19,4] <- 'KY'
+comb.dat[22,4] <- 'NE'
+comb.dat[28,4] <- 'AK'
+comb.dat[30,4] <- 'NJ'
 
-comb[30,3] <- 'Lebanon'
+comb.dat[30,3] <- 'Lebanon'
 
 # Create unique ID
 library(stringr)
-comb <- comb |>
+comb.dat <- comb.dat |>
   mutate(Program_ID = paste0(word(Program,1),"_", City,'_', State)) |>
   dplyr::select(Program_ID, everything())
 
@@ -195,7 +195,7 @@ comb <- comb |>
 ## --------------- CREATE DONATIONS DF -----------------------------------------
 
 # Create a vector of column names
-col.list <- as_tibble(colnames(comb))
+col.list <- as_tibble(colnames(comb.dat))
 
 # Create a vector of the columns we want
 donations.col <- c(
@@ -208,14 +208,14 @@ donations.col <- c(
   "Game_birds", "Game_birds_units", "Other_donations", "Other_donations_units"
 )
 
-donations <- comb |> dplyr::select(
-  "Program", all_of(donations.col)
+donations <- comb.dat |> dplyr::select(
+  "Program_ID", all_of(donations.col)
 )
 
-# Pivot the data to longer format
+# Pivot the data to longer format [CHECK TO SEE IT WORKED]
 donations.lg <- donations %>%
   pivot_longer(
-    cols = -Program,
+    cols = -Program_ID,
     names_to = "Type_Units",
     values_to = "Value"
   ) %>%
@@ -249,20 +249,22 @@ donations.lg$Donations <- as.numeric(donations.lg$Donations)
 # Round values
 donations.lg$Donations <- round(donations.lg$Donations)
 
+# Make sure ID is a factor
+donations.lg$Program_ID <- as_factor(donations.lg$Program_ID)
+
 # Take a look at the total donations data
 processed_data <- donations.lg |>
   filter(Type == "Total_donations") |>
   filter(Donations > 0) |>
-  group_by(Program) |>
+  filter(Donations < 300001) |> # this drops programs potentially reporting all-time
+  group_by(Program_ID) |>
   summarise(Donations = sum(Donations, na.rm = TRUE)) |>
-  arrange(desc(Donations)) |>
-  mutate(
-    Program_abbr = str_sub(Program, 1, 3),
-    Program_abbr = make.unique(Program_abbr, sep = "_")
-  ) |>
-  mutate(Program_abbr = fct_inorder(Program_abbr))
+  arrange(desc(Donations)) 
 
-ggplot(processed_data, aes(x = fct_rev(Program_abbr), y = Donations)) +
+# Beg and plead to get the programs in the right order
+processed_data$Program_ID <- factor(processed_data$Program_ID, levels = processed_data$Program_ID)
+
+ggplot(processed_data, aes(x = fct_rev(Program_ID), y = log(Donations))) +
   geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +
   theme_minimal() +
@@ -273,7 +275,7 @@ ggplot(processed_data, aes(x = fct_rev(Program_abbr), y = Donations)) +
   ) +
   scale_y_continuous(labels = scales::comma)
 
-unique(processed_data$Program) # 37 values
+unique(processed_data$Program_ID) # 37 values
 
 library(fitdistrplus)
 descdist(processed_data$Donations) # beta
@@ -301,12 +303,12 @@ funds.col <- c(
   "Funding_state_agency_units", "Funding_other_units"
 )
 
-funds <- comb |> dplyr::select(Program, all_of(funds.col))
+funds <- comb.dat |> dplyr::select(Program_ID, all_of(funds.col))
 
 # Pivot the data to longer format
 funds.lg <- funds %>%
   pivot_longer(
-    cols = -Program,
+    cols = -Program_ID,
     names_to = "Type_Units",
     values_to = "Value"
   ) %>%
@@ -332,16 +334,14 @@ funds.lg$Donations <- round(funds.lg$Donations)
 processed_data <- funds.lg |>
   filter(Type == "Funding_total") |>
   filter(Donations > 0) |>
-  group_by(Program) |>
+  group_by(Program_ID) |>
   summarise(Donations = sum(Donations, na.rm = TRUE)) |>
-  arrange(desc(Donations)) |>
-  mutate(
-    Program_abbr = str_sub(Program, 1, 3),
-    Program_abbr = make.unique(Program_abbr, sep = "_")
-  ) |>
-  mutate(Program_abbr = fct_inorder(Program_abbr))
+  arrange(desc(Donations))
 
-ggplot(processed_data, aes(x = fct_rev(Program_abbr), y = Donations)) +
+# Beg and plead to get the programs in the right order
+processed_data$Program_ID <- factor(processed_data$Program_ID, levels = processed_data$Program_ID)
+  
+ggplot(processed_data, aes(x = fct_rev(Program_ID), y = log(Donations))) +
   geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +
   theme_minimal() +
@@ -352,7 +352,7 @@ ggplot(processed_data, aes(x = fct_rev(Program_abbr), y = Donations)) +
   ) +
   scale_y_continuous(labels = scales::comma)
 
-unique(processed_data$Program) # 28 values
+unique(processed_data$Program_ID) # 28 values
 
 library(fitdistrplus)
 descdist(processed_data$Donations) # beta
@@ -374,13 +374,13 @@ expansion.col <- c(
   "Challenges_comments"
 )
 
-expansion <- comb |> dplyr::select(Program, all_of(expansion.col))
+expansion <- comb.dat |> dplyr::select(Program_ID, all_of(expansion.col))
 
 # 10 is a critical challenge, 0 is no challenge
 
 expansion.lg <- expansion |>
   pivot_longer(cols = 2:9, names_to = "Type", values_to = "Score") |>
-  dplyr::select(Program, Type, Score, Challenges_comments)
+  dplyr::select(Program_ID, Type, Score, Challenges_comments)
 
 expansion.lg$Score <- as.numeric(expansion.lg$Score)
 
@@ -411,7 +411,7 @@ ggplot(processed_data, aes(x = fct_rev(Type), y = Mean)) +
   ) +
   scale_y_continuous(labels = scales::comma)
 
-rm(processed_data, expansion.lg.sum, expansion)
+rm(processed_data, expansion)
 ## --------------- CREATE STRUCTURE DF -----------------------------------------
 
 structure.col <- c(
@@ -423,8 +423,39 @@ structure.col <- c(
   "Employees_comments"
 )
 
-structure <- comb |> dplyr::select(Program, State, all_of(structure.col))
+structure <- comb.dat.dat |> dplyr::select(Program_ID, all_of(structure.col))
+
+# Pivot the data to longer format
+structure.lg <- structure |>
+  pivot_longer(
+    cols = -c(Program_ID, Employees_comments),
+    names_to = "Type_Units",
+    values_to = "Value"
+) 
+
+structure.lg$Type_Units <-gsub("Employees_","", as.character(structure.lg$Type_Units))
+
+structure.lg <- structure.lg |>
+  separate(Type_Units, into = c("Type", "Units"), sep = "units_", fill = "right")
+# NEED TO FIGURE OUT HOW TO NOT DROP THE 
+
+# Separate the data into value and unit data frames
+value_data <- structure.lg |> filter(is.na(Units)) |> dplyr::select(-Unit)
+unit_data <- structure.lg |> filter(!is.na(Units)) |> dplyr::select(-Type) |>
+  dplyr::rename(Type = Units) |> rename(Units = Value)
+
+# Join the value and unit data frames
+structure.lg <- left_join(value_data, unit_data, by = c("Program_ID", "Type", "Employees_comments"))
+
+# Arrange the columns as specified
+structure.lg <- structure.lg %>%
+  dplyr::select(Program_ID, Type, Value, Units, Employees_comments)
+
+# Clear the decks
+rm(unit_data, value_data, structure)
+
+
 
 ## --------------- CREATE CHARACTERISTICS DF -----------------------------------
 
-char <- comb |> select("Program", -all_of(donations.col))
+char <- comb.dat |> select("Program", -all_of(donations.col))
