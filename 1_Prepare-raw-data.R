@@ -89,6 +89,7 @@ colnames(comb.dat)[20] <- "Sample_start_month"
 colnames(comb.dat)[21] <- "Sample_start_year"
 colnames(comb.dat)[22] <- "Sample_end_month"
 colnames(comb.dat)[23] <- "Sample_end_year"
+
 colnames(comb.dat)[25] <- "Total_donations"
 colnames(comb.dat)[26] <- "Total_donations_units"
 colnames(comb.dat)[27] <- "White_tailed_deer"
@@ -118,11 +119,13 @@ colnames(comb.dat)[50] <- "Alligator_units"
 colnames(comb.dat)[51] <- "Game_birds_units"
 colnames(comb.dat)[52] <- "Other_donations_units"
 colnames(comb.dat)[53] <- "Donations_comments"
+
 colnames(comb.dat)[54] <- "Average_donation_distance"
 colnames(comb.dat)[55] <- "Max_donation_distance"
 colnames(comb.dat)[56] <- "Average_donation_distance_units"
 colnames(comb.dat)[57] <- "Max_donation_distance_units"
 colnames(comb.dat)[58] <- "Program_scale"
+
 colnames(comb.dat)[60] <- "Challenges_USDA_inspection"
 colnames(comb.dat)[61] <- "Challenges_state_inspection"
 colnames(comb.dat)[62] <- "Challengea_hunters"
@@ -130,7 +133,15 @@ colnames(comb.dat)[63] <- "Challenges_funding"
 colnames(comb.dat)[64] <- "Challenges_processors"
 colnames(comb.dat)[65] <- "Challenges_transportation"
 colnames(comb.dat)[66] <- "Challenges_storage"
-colnames(comb.dat)[67] <- "Challenges_Other"
+colnames(comb.dat)[67] <- "Challenges_other"
+
+colnames(comb.dat)[73] <- "Expansion_funding"
+colnames(comb.dat)[74] <- "Expansion_hunter"
+colnames(comb.dat)[75] <- "Expansion_storage"
+colnames(comb.dat)[76] <- "Expansion_transportation"
+colnames(comb.dat)[77] <- "Expansion_processor"
+colnames(comb.dat)[78] <- "Expansion_other"
+
 colnames(comb.dat)[87] <- "Employees_volunteers"
 colnames(comb.dat)[88] <- "Employees_volunteer_hrs"
 colnames(comb.dat)[89] <- "Employees_full_time"
@@ -141,6 +152,7 @@ colnames(comb.dat)[93] <- "Employees_units_volunteer_hrs"
 colnames(comb.dat)[94] <- "Employees_units_full_time"
 colnames(comb.dat)[95] <- "Employees_units_part_time"
 colnames(comb.dat)[96] <- "Employees_units_paid_hrs"
+
 colnames(comb.dat)[98] <- "Funding_total"
 colnames(comb.dat)[99] <- "Funding_total_units"
 colnames(comb.dat)[100] <- "Funding_public_donations"
@@ -156,17 +168,17 @@ colnames(comb.dat)[109] <- "Funding_grants_units"
 colnames(comb.dat)[110] <- "Funding_state_agency_units"
 colnames(comb.dat)[111] <- "Funding_other_units"
 
-# Fix state names 
+# Fix state names
 class(comb.dat$State)
 convert_to_abbreviation <- function(state) {
   if (state %in% state.abb) {
-    return(state)  # Already abbreviated
+    return(state) # Already abbreviated
   } else {
     match_index <- match(state, state.name)
     if (!is.na(match_index)) {
-      return(state.abb[match_index])  # Convert to abbreviation
+      return(state.abb[match_index]) # Convert to abbreviation
     } else {
-      return(state)  # If not found, return the original
+      return(state) # If not found, return the original
     }
   }
 }
@@ -175,22 +187,22 @@ comb.dat <- comb.dat %>%
   mutate(State = sapply(State, convert_to_abbreviation))
 
 # Fix the stragglers
-comb.dat[1,4] <- 'YK'
-comb.dat[16,4] <- 'SC'
-comb.dat[19,4] <- 'KY'
-comb.dat[22,4] <- 'NE'
-comb.dat[28,4] <- 'AK'
-comb.dat[30,4] <- 'NJ'
+comb.dat[1, 4] <- "YK"
+comb.dat[16, 4] <- "SC"
+comb.dat[19, 4] <- "KY"
+comb.dat[22, 4] <- "NE"
+comb.dat[28, 4] <- "AK"
+comb.dat[30, 4] <- "NJ"
 
-comb.dat[30,3] <- 'Lebanon'
+comb.dat[30, 3] <- "Lebanon"
 
 # Create unique ID
 library(stringr)
 comb.dat <- comb.dat |>
-  mutate(Program_ID = paste0(word(Program,1),"_", City,'_', State)) |>
+  mutate(Program_ID = paste0(word(Program, 1), "_", City, "_", State)) |>
   dplyr::select(Program_ID, everything())
 
-  # Fix Lincoln, NE
+# Fix Lincoln, NE
 
 ## --------------- CREATE DONATIONS DF -----------------------------------------
 
@@ -259,21 +271,22 @@ processed_data <- donations.lg |>
   filter(Donations < 300001) |> # this drops programs potentially reporting all-time
   group_by(Program_ID) |>
   summarise(Donations = sum(Donations, na.rm = TRUE)) |>
-  arrange(desc(Donations)) 
+  arrange(desc(Donations))
 
 # Beg and plead to get the programs in the right order
 processed_data$Program_ID <- factor(processed_data$Program_ID, levels = processed_data$Program_ID)
 
-ggplot(processed_data, aes(x = fct_rev(Program_ID), y = log(Donations))) +
+ggplot(processed_data, aes(x = fct_rev(Program_ID), y = Donations)) +
   geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +
   theme_minimal() +
   labs(
-    title = "Total Donations by Program",
-    x = "Program (Abbreviated)",
-    y = "Donations"
+    title = "Total Meat Donations by Program",
+    x = "Program",
+    y = "Donations (g)"
   ) +
   scale_y_continuous(labels = scales::comma)
+
 
 unique(processed_data$Program_ID) # 37 values
 
@@ -340,15 +353,15 @@ processed_data <- funds.lg |>
 
 # Beg and plead to get the programs in the right order
 processed_data$Program_ID <- factor(processed_data$Program_ID, levels = processed_data$Program_ID)
-  
-ggplot(processed_data, aes(x = fct_rev(Program_ID), y = log(Donations))) +
+
+ggplot(processed_data, aes(x = fct_rev(Program_ID), y = Donations)) +
   geom_bar(stat = "identity", fill = "skyblue") +
   coord_flip() +
   theme_minimal() +
   labs(
-    title = "Total Donations by Program",
-    x = "Program (Abbreviated)",
-    y = "Donations"
+    title = "Total Financial Donations by Program",
+    x = "Program",
+    y = "Donations ($)"
   ) +
   scale_y_continuous(labels = scales::comma)
 
@@ -360,9 +373,9 @@ descdist(processed_data$Donations) # beta
 # Clear the decks
 rm(funds, processed_data, funds)
 
-## --------------- CREATE CHALLENGES/EXPANSION DF ------------------------------
+## --------------- CREATE CHALLENGES DF ----------------------------------------
 
-expansion.col <- c(
+challenges.col <- c(
   "Challenges_USDA_inspection",
   "Challenges_state_inspection",
   "Challengea_hunters",
@@ -374,17 +387,17 @@ expansion.col <- c(
   "Challenges_comments"
 )
 
-expansion <- comb.dat |> dplyr::select(Program_ID, all_of(expansion.col))
+challenges <- comb.dat |> dplyr::select(Program_ID, all_of(challenges.col))
 
 # 10 is a critical challenge, 0 is no challenge
 
-expansion.lg <- expansion |>
+challenges.lg <- challenges |>
   pivot_longer(cols = 2:9, names_to = "Type", values_to = "Score") |>
   dplyr::select(Program_ID, Type, Score, Challenges_comments)
 
-expansion.lg$Score <- as.numeric(expansion.lg$Score)
+challenges.lg$Score <- as.numeric(challenges.lg$Score)
 
-processed_data <- expansion.lg |>
+processed_data <- challenges.lg |>
   group_by(Type) |>
   summarize(
     Mean = mean(Score, na.rm = TRUE),
@@ -405,13 +418,81 @@ ggplot(processed_data, aes(x = fct_rev(Type), y = Mean)) +
   coord_flip() +
   theme_minimal() +
   labs(
-    title = "Biggest challengs",
-    x = "Challenge type",
+    title = "Biggest challenges",
+    x = "",
     y = "Mean score"
   ) +
   scale_y_continuous(labels = scales::comma)
 
-rm(processed_data, expansion)
+rm(processed_data, challenges)
+
+## --------------- CREATE EXPANSION DF -----------------------------------------
+
+expansion.col <- c(
+  "Expansion", "Expansion_comments", "Expansion_funding",
+  "Expansion_hunter", "Expansion_storage", "Expansion_transportation",
+  "Expansion_processor", "Expansion_other", "Expansion_limitations_comments"
+)
+
+expansion.all <- comb.dat |> dplyr::select(Program_ID, all_of(expansion.col))
+
+# 10 is a critical expansion limitation, 0 is no limitation
+
+# Lets look at how many said yes/no to need for expansion
+expansion <- expansion.all |> dplyr::select(Program_ID, Expansion,
+                                               Expansion_comments)
+expansion |>
+  filter(Expansion != '') |>
+  group_by(Expansion) |>
+  summarize(Count = n()) |>
+  ggplot(aes(x=Expansion, y = Count, fill = Expansion))+
+  geom_bar(stat='identity')+
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = 'none') +
+  labs(
+    title = "Is there a need for expansion (n = 39), 77% answer yes",
+    x = "",
+    y = ""
+  )
+
+
+expansion.lim.lg <- expansion.all |>
+  pivot_longer(cols = 4:9, names_to = "Type", values_to = "Score") |>
+  dplyr::select(Program_ID, Type, Score, Expansion_limitations_comments)
+
+expansion.lim.lg$Score <- as.numeric(expansion.lim.lg$Score)
+
+processed_data <- expansion.lim.lg |>
+  group_by(Type) |>
+  summarize(
+    Mean = mean(Score, na.rm = TRUE),
+    std = sd(Score, na.rm = TRUE)
+  ) |>
+  arrange(desc(Mean))
+
+class(processed_data$Type)
+processed_data$Type <- as_factor(processed_data$Type)
+
+new_levels <- sub("^[^_]*_([^_]*).*", "\\1", levels(processed_data$Type))
+levels(processed_data$Type) <- new_levels
+processed_data$Type <- factor(processed_data$Type, levels = processed_data$Type)
+
+ggplot(processed_data, aes(x = fct_rev(Type), y = Mean)) +
+  geom_errorbar(aes(ymin = Mean - std, ymax = Mean + std)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  coord_flip() +
+  theme_minimal() +
+  labs(
+    title = "Expansion limitations",
+    x = "",
+    y = "Mean score"
+  ) +
+  scale_y_continuous(labels = scales::comma)
+
+rm(processed_data, expansion.all)
+
+
 ## --------------- CREATE STRUCTURE DF -----------------------------------------
 
 structure.col <- c(
@@ -423,7 +504,7 @@ structure.col <- c(
   "Employees_comments"
 )
 
-structure <- comb.dat.dat |> dplyr::select(Program_ID, all_of(structure.col))
+structure <- comb.dat |> dplyr::select(Program_ID, all_of(structure.col))
 
 # Pivot the data to longer format
 structure.lg <- structure |>
@@ -431,18 +512,22 @@ structure.lg <- structure |>
     cols = -c(Program_ID, Employees_comments),
     names_to = "Type_Units",
     values_to = "Value"
-) 
+  )
 
-structure.lg$Type_Units <-gsub("Employees_","", as.character(structure.lg$Type_Units))
+structure.lg$Type_Units <- gsub("Employees_", "", as.character(structure.lg$Type_Units))
 
 structure.lg <- structure.lg |>
   separate(Type_Units, into = c("Type", "Units"), sep = "units_", fill = "right")
-# NEED TO FIGURE OUT HOW TO NOT DROP THE 
 
 # Separate the data into value and unit data frames
-value_data <- structure.lg |> filter(is.na(Units)) |> dplyr::select(-Unit)
-unit_data <- structure.lg |> filter(!is.na(Units)) |> dplyr::select(-Type) |>
-  dplyr::rename(Type = Units) |> rename(Units = Value)
+value_data <- structure.lg |>
+  filter(is.na(Units)) |>
+  dplyr::select(-Units)
+unit_data <- structure.lg |>
+  filter(!is.na(Units)) |>
+  dplyr::select(-Type) |>
+  dplyr::rename(Type = Units) |>
+  rename(Units = Value)
 
 # Join the value and unit data frames
 structure.lg <- left_join(value_data, unit_data, by = c("Program_ID", "Type", "Employees_comments"))
@@ -451,11 +536,50 @@ structure.lg <- left_join(value_data, unit_data, by = c("Program_ID", "Type", "E
 structure.lg <- structure.lg %>%
   dplyr::select(Program_ID, Type, Value, Units, Employees_comments)
 
+# Fix people inexplicably writing in the value column constantly
+structure.lg[55, 3] <- "1644"
+structure.lg[82, 3] <- "100"
+structure.lg[185, 3] <- "2080"
+
+# Convert to numeric
+structure.lg$Value <- as.numeric(structure.lg$Value)
+
 # Clear the decks
 rm(unit_data, value_data, structure)
 
+# Function to create a plot for a specific type
+create_plot <- function(type, color, label) {
+  plot_data <- structure.lg %>%
+    filter(Type == type) %>%
+    filter(Value > 0) |>
+    arrange(Value) %>%
+    mutate(Program_ID = factor(Program_ID, levels = unique(Program_ID)))
 
+  ggplot(plot_data, aes(x = Program_ID, y = Value, fill = Type)) +
+    geom_bar(stat = "identity") +
+    scale_fill_manual(values = color) +
+    coord_flip() +
+    theme_minimal() +
+    theme(legend.position = "none") +
+    labs(title = paste("Values for", type), x = "Program ID", y = paste(label))
+}
+
+# Create individual plots
+plot_volunteers <- create_plot("volunteers", "#F8766D", "# of Volunteers")
+plot_volunteer_hrs <- create_plot("volunteer_hrs", "#00BFC4", "Volunteer Hours")
+plot_full_time <- create_plot("full_time", "#00BA38", "# of Full-time Employees")
+plot_part_time <- create_plot("part_time", "#C49A00", "# of Part-time Employees")
+plot_paid_hrs <- create_plot("paid_hrs", "#FF61CC", "Paid Hours")
+
+# Combine plots using patchwork
+library(patchwork)
+combined_plot <- plot_volunteers + plot_volunteer_hrs + plot_full_time + plot_part_time + plot_paid_hrs +
+  plot_layout(ncol = 2)
+
+# Print the combined plot
+print(combined_plot)
 
 ## --------------- CREATE CHARACTERISTICS DF -----------------------------------
 
-char <- comb.dat |> select("Program", -all_of(donations.col))
+exclude.ls <- c(donations.col, expansion.col, structure.col, funds.col)
+other <- comb.dat |> dplyr::select(-all_of(exclude.ls))
