@@ -383,7 +383,7 @@ challenges.col <- c(
   "Challenges_processors",
   "Challenges_transportation",
   "Challenges_storage",
-  "Challenges_Other",
+  "Challenges_other",
   "Challenges_comments"
 )
 
@@ -492,7 +492,6 @@ ggplot(processed_data, aes(x = fct_rev(Type), y = Mean)) +
 
 rm(processed_data, expansion.all)
 
-
 ## --------------- CREATE STRUCTURE DF -----------------------------------------
 
 structure.col <- c(
@@ -583,3 +582,8 @@ print(combined_plot)
 
 exclude.ls <- c(donations.col, expansion.col, structure.col, funds.col)
 other <- comb.dat |> dplyr::select(-all_of(exclude.ls))
+
+# Export zip codes for map
+colnames(other)[7] <- "Zip"
+zip <- other |> dplyr::select(Program_ID, Zip)
+write.csv(zip, 'Output/Zip-codes.csv', row.names = FALSE)
