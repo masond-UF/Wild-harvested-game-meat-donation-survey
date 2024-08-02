@@ -293,14 +293,6 @@ unique(processed_data$Program_ID) # 37 values
 library(fitdistrplus)
 descdist(processed_data$Donations) # beta
 
-library(EnvStats)
-ebeta(processed_data$Donations, method = "mle")
-
-scale_values <- function(x) {
-  (x - min(x)) / (max(x) - min(x))
-}
-ebeta(scale_values(processed_data$Donations))
-
 # Clear the decks
 rm(donations, processed_data)
 
@@ -587,3 +579,125 @@ other <- comb.dat |> dplyr::select(-all_of(exclude.ls))
 colnames(other)[7] <- "Zip"
 zip <- other |> dplyr::select(Program_ID, Zip)
 write.csv(zip, 'Output/Zip-codes.csv', row.names = FALSE)
+
+### Organization type summary
+organization.type <- other |>
+  group_by(Organization_type) |>
+  summarize(Count = n()) |>
+  arrange(Count)
+
+# Fix order
+organization.type$Organization_type <- factor(organization.type$Organization_type, 
+                                              levels = organization.type$Organization_type)
+
+# Visualize
+ggplot(organization.type, aes(x=Organization_type, y = Count, fill = Organization_type))+
+  geom_bar(stat='identity')+
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = 'none') +
+  labs(
+    title = "Organization type",
+    x = "",
+    y = ""
+  )
+  
+rm(organization.type)
+
+## Broader organization
+broader <- other |>
+  group_by(Broader_organization) |>
+  summarize(Count = n()) |>
+  arrange(Count)
+
+# Fix order
+broader$Broader_organization <- factor(broader$Broader_organization, 
+                        levels = broader$Broader_organization)
+                                        
+# Visualize
+ggplot(broader, aes(x=Broader_organization, y = Count, fill = Broader_organization))+
+  geom_bar(stat='identity')+
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = 'none') +
+  labs(
+    title = "Are you part of a broader orgnization (63% no)?",
+    x = "",
+    y = ""
+  )
+
+rm(broader)
+
+### Network binary
+other[36,12] <- "No response"
+
+network <- other |>
+  group_by(Network) |>
+  summarize(Count = n()) |>
+  arrange(Count)
+
+# Fix order
+network$Network <- factor(network$Network, levels = network$Network)
+                                        
+# Visualize
+ggplot(network, aes(x=Network, y = Count, fill = Network))+
+  geom_bar(stat='identity')+
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = 'none') +
+  labs(
+    title = "Are you part of a larger network?",
+    x = "",
+    y = ""
+  )
+
+rm(network)
+
+### Network scale summary (only yes responses to network)
+network.scale <- other |>
+  filter(Network == 'Yes') |>
+  group_by(Network_scale) |>
+  summarize(Count = n()) |>
+  arrange(Count)
+
+# Fix order
+network.scale$Network_scale <- factor(network.scale$Network_scale, 
+                                              levels = network.scale$Network_scale)
+
+# Visualize
+ggplot(network.scale, aes(x=Network_scale, y = Count, fill = Network_scale))+
+  geom_bar(stat='identity')+
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = 'none') +
+  labs(
+    title = "Network scale",
+    x = "",
+    y = ""
+  )
+
+rm(network.scale)
+
+### Program length
+other[15,18] <- '2007'
+other[31,18] <- '2012'
+other[40,18] <- '2012'
+
+other$Program_start <- as.numeric(other$Program_start)
+
+other <- other |>
+  mutate(Program_length = 2024-Program_start) |>
+  na.omit(Program_length)
+
+ggplot(other, aes(x = Program_length, fill = Network)) +
+    geom_histogram(binwidth = 5) +
+    coord_flip() +
+  theme_minimal() +
+  theme(legend.position = 'bottom') +
+  labs(
+    title = "Network scale",
+    x = "Program length (years)",
+    y = "Frequency"
+  )
+
+
