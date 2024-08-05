@@ -142,6 +142,13 @@ colnames(comb.dat)[76] <- "Expansion_transportation"
 colnames(comb.dat)[77] <- "Expansion_processor"
 colnames(comb.dat)[78] <- "Expansion_other"
 
+colnames(comb.dat)[80] <- "Number_processors"
+colnames(comb.dat)[81] <- "Number_recipients"
+colnames(comb.dat)[82] <- "Processor_units"
+colnames(comb.dat)[83] <- "Receipient_units"
+colnames(comb.dat)[84] <- "Processor_recipient_comments"
+
+
 colnames(comb.dat)[87] <- "Employees_volunteers"
 colnames(comb.dat)[88] <- "Employees_volunteer_hrs"
 colnames(comb.dat)[89] <- "Employees_full_time"
@@ -431,17 +438,19 @@ expansion.all <- comb.dat |> dplyr::select(Program_ID, all_of(expansion.col))
 # 10 is a critical expansion limitation, 0 is no limitation
 
 # Lets look at how many said yes/no to need for expansion
-expansion <- expansion.all |> dplyr::select(Program_ID, Expansion,
-                                               Expansion_comments)
+expansion <- expansion.all |> dplyr::select(
+  Program_ID, Expansion,
+  Expansion_comments
+)
 expansion |>
-  filter(Expansion != '') |>
+  filter(Expansion != "") |>
   group_by(Expansion) |>
   summarize(Count = n()) |>
-  ggplot(aes(x=Expansion, y = Count, fill = Expansion))+
-  geom_bar(stat='identity')+
+  ggplot(aes(x = Expansion, y = Count, fill = Expansion)) +
+  geom_bar(stat = "identity") +
   coord_flip() +
   theme_minimal() +
-  theme(legend.position = 'none') +
+  theme(legend.position = "none") +
   labs(
     title = "Is there a need for expansion (n = 39), 77% answer yes",
     x = "",
@@ -572,13 +581,16 @@ print(combined_plot)
 
 ## --------------- CREATE CHARACTERISTICS DF -----------------------------------
 
-exclude.ls <- c(donations.col, expansion.col, structure.col, funds.col)
+exclude.ls <- c(
+  donations.col, expansion.col, structure.col, funds.col,
+  challenges.col
+)
 other <- comb.dat |> dplyr::select(-all_of(exclude.ls))
 
 # Export zip codes for map
 colnames(other)[7] <- "Zip"
 zip <- other |> dplyr::select(Program_ID, Zip)
-write.csv(zip, 'Output/Zip-codes.csv', row.names = FALSE)
+write.csv(zip, "Output/Zip-codes.csv", row.names = FALSE)
 
 ### Organization type summary
 organization.type <- other |>
@@ -587,21 +599,22 @@ organization.type <- other |>
   arrange(Count)
 
 # Fix order
-organization.type$Organization_type <- factor(organization.type$Organization_type, 
-                                              levels = organization.type$Organization_type)
+organization.type$Organization_type <- factor(organization.type$Organization_type,
+  levels = organization.type$Organization_type
+)
 
 # Visualize
-ggplot(organization.type, aes(x=Organization_type, y = Count, fill = Organization_type))+
-  geom_bar(stat='identity')+
+ggplot(organization.type, aes(x = Organization_type, y = Count, fill = Organization_type)) +
+  geom_bar(stat = "identity") +
   coord_flip() +
   theme_minimal() +
-  theme(legend.position = 'none') +
+  theme(legend.position = "none") +
   labs(
     title = "Organization type",
     x = "",
     y = ""
   )
-  
+
 rm(organization.type)
 
 ## Broader organization
@@ -611,15 +624,16 @@ broader <- other |>
   arrange(Count)
 
 # Fix order
-broader$Broader_organization <- factor(broader$Broader_organization, 
-                        levels = broader$Broader_organization)
-                                        
+broader$Broader_organization <- factor(broader$Broader_organization,
+  levels = broader$Broader_organization
+)
+
 # Visualize
-ggplot(broader, aes(x=Broader_organization, y = Count, fill = Broader_organization))+
-  geom_bar(stat='identity')+
+ggplot(broader, aes(x = Broader_organization, y = Count, fill = Broader_organization)) +
+  geom_bar(stat = "identity") +
   coord_flip() +
   theme_minimal() +
-  theme(legend.position = 'none') +
+  theme(legend.position = "none") +
   labs(
     title = "Are you part of a broader orgnization (63% no)?",
     x = "",
@@ -629,7 +643,7 @@ ggplot(broader, aes(x=Broader_organization, y = Count, fill = Broader_organizati
 rm(broader)
 
 ### Network binary
-other[36,12] <- "No response"
+other[36, 12] <- "No response"
 
 network <- other |>
   group_by(Network) |>
@@ -638,13 +652,13 @@ network <- other |>
 
 # Fix order
 network$Network <- factor(network$Network, levels = network$Network)
-                                        
+
 # Visualize
-ggplot(network, aes(x=Network, y = Count, fill = Network))+
-  geom_bar(stat='identity')+
+ggplot(network, aes(x = Network, y = Count, fill = Network)) +
+  geom_bar(stat = "identity") +
   coord_flip() +
   theme_minimal() +
-  theme(legend.position = 'none') +
+  theme(legend.position = "none") +
   labs(
     title = "Are you part of a larger network?",
     x = "",
@@ -655,21 +669,22 @@ rm(network)
 
 ### Network scale summary (only yes responses to network)
 network.scale <- other |>
-  filter(Network == 'Yes') |>
+  filter(Network == "Yes") |>
   group_by(Network_scale) |>
   summarize(Count = n()) |>
   arrange(Count)
 
 # Fix order
-network.scale$Network_scale <- factor(network.scale$Network_scale, 
-                                              levels = network.scale$Network_scale)
+network.scale$Network_scale <- factor(network.scale$Network_scale,
+  levels = network.scale$Network_scale
+)
 
 # Visualize
-ggplot(network.scale, aes(x=Network_scale, y = Count, fill = Network_scale))+
-  geom_bar(stat='identity')+
+ggplot(network.scale, aes(x = Network_scale, y = Count, fill = Network_scale)) +
+  geom_bar(stat = "identity") +
   coord_flip() +
   theme_minimal() +
-  theme(legend.position = 'none') +
+  theme(legend.position = "none") +
   labs(
     title = "Network scale",
     x = "",
@@ -678,26 +693,132 @@ ggplot(network.scale, aes(x=Network_scale, y = Count, fill = Network_scale))+
 
 rm(network.scale)
 
+### Network facilitates?
+
+network.fac <- other |>
+  filter(Network == "Yes") |>
+  group_by(Network_facilitate) |>
+  summarize(Count = n()) |>
+  arrange(Count)
+
+# Fix order
+network.fac$Network_facilitate <- factor(network.fac$Network_facilitate,
+  levels = network.fac$Network_facilitate
+)
+
+# Visualize
+ggplot(network.fac, aes(x = Network_facilitate, y = Count, fill = Network_facilitate)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(
+    title = "Does your network facilitate game meat donation? (67% yes)",
+    x = "",
+    y = ""
+  )
+
+rm(network.fac)
+
 ### Program length
-other[15,18] <- '2007'
-other[31,18] <- '2012'
-other[40,18] <- '2012'
+other[15, 18] <- "2007"
+other[31, 18] <- "2012"
+other[40, 18] <- "2012"
 
 other$Program_start <- as.numeric(other$Program_start)
 
 other <- other |>
-  mutate(Program_length = 2024-Program_start) |>
+  mutate(Program_length = 2024 - Program_start) |>
   na.omit(Program_length)
 
+### Network
 ggplot(other, aes(x = Program_length, fill = Network)) +
-    geom_histogram(binwidth = 5) +
-    coord_flip() +
+  geom_histogram(binwidth = 10) +
   theme_minimal() +
-  theme(legend.position = 'bottom') +
+  theme(legend.position = "bottom") +
   labs(
-    title = "Network scale",
+    title = "How long have you been donated game meat?",
     x = "Program length (years)",
+    y = "Frequency"
+  ) +
+  facet_wrap(~Network)
+
+### Program length
+ggplot(other, aes(x = Program_length, fill = Program_scale)) +
+  geom_histogram(binwidth = 10) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "How long has your program been active?",
+    x = "Years",
+    y = "Frequency"
+  ) +
+  facet_wrap(~Program_scale)
+
+### Processors
+other$Number_processors <- as.numeric(other$Number_processors)
+
+ggplot(other, aes(x = Program_length, y = Number_processors, fill = Program_scale)) +
+  geom_point(shape = 21, size = 3) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "How many processors do you work with?",
+    x = "Program length (years)",
+    y = "Number of processors"
+  )
+
+### Recipients
+other$Number_recipients <- as.numeric(other$Number_recipients)
+
+ggplot(other, aes(x = Program_length, y = Number_recipients, fill = Program_scale)) +
+  geom_point(shape = 21, size = 3) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "How many recipients do you work with?",
+    x = "Program length (years)",
+    y = "Number of recipients"
+  )
+
+### Donation distance
+other <- as_tibble(other)
+
+other$Average_donation_distance <- as.numeric(other$Average_donation_distance)
+
+other[8,27] <- 20
+other[12,27] <- 15
+other[16,27] <- 20
+other[18,27] <- 15
+other[35,27] <- 35
+
+ggplot(other, aes(x = Average_donation_distance)) +
+  geom_histogram(binwidth = 10) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "Average donor distance",
+    x = "Miles",
     y = "Frequency"
   )
 
+ggplot(other, aes(x = Average_donation_distance, y = Number_recipients, fill = Program_scale)) +
+  geom_jitter(shape = 21, size = 3) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "Donor distance and number of recipients",
+    x = "Average donor distance (miles)",
+    y = "Number of recipients"
+  )
 
+ggplot(other, aes(x = Average_donation_distance, y = Number_processors, fill = Program_scale)) +
+  geom_jitter(shape = 21, size = 3) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "Donor distance and number of processors",
+    x = "Average donor distance (miles)",
+    y = "Number of processors"
+  )
+  
